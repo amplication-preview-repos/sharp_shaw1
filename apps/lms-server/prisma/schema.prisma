@@ -1,0 +1,75 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Student {
+  createdAt           DateTime             @default(now())
+  email               String?
+  id                  String               @id @default(cuid())
+  name                String?
+  personalAssistances PersonalAssistance[]
+  updatedAt           DateTime             @updatedAt
+}
+
+model PersonalAssistance {
+  assistanceType EnumPersonalAssistanceAssistanceType?
+  createdAt      DateTime                              @default(now())
+  details        String?
+  id             String                                @id @default(cuid())
+  student        Student?                              @relation(fields: [studentId], references: [id])
+  studentId      String?
+  updatedAt      DateTime                              @updatedAt
+}
+
+model StudyMaterial {
+  course      Course?  @relation(name: "CourseOnStudyMaterials", fields: [courseId], references: [id])
+  courseId    String?
+  courses     Course[] @relation(name: "CoursesOnStudyMaterial")
+  createdAt   DateTime @default(now())
+  description String?
+  file        Json?
+  id          String   @id @default(cuid())
+  title       String?
+  updatedAt   DateTime @updatedAt
+}
+
+model ChatMessage {
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  message   String?
+  sender    String?
+  timestamp DateTime?
+  updatedAt DateTime  @updatedAt
+}
+
+model Course {
+  createdAt       DateTime        @default(now())
+  description     String?
+  id              String          @id @default(cuid())
+  studyMaterial   StudyMaterial?  @relation(name: "CoursesOnStudyMaterial", fields: [studyMaterialId], references: [id])
+  studyMaterialId String?
+  studyMaterials  StudyMaterial[] @relation(name: "CourseOnStudyMaterials")
+  title           String?
+  updatedAt       DateTime        @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumPersonalAssistanceAssistanceType {
+  Option1
+}
